@@ -1,103 +1,85 @@
 ﻿using System;
 using BepInEx;
 using BepInEx.Logging;
+using GameNetcodeStuff;
 using HarmonyLib;
+using Unity.Netcode;
 using UnityEngine;
 
 namespace ApparatusFix
 {
-  [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
-  public class Plugin : BaseUnityPlugin
-  {
-    internal static ManualLogSource logger;
-    internal static Harmony harmony = new(PluginInfo.PLUGIN_GUID);
-
-    private void Awake()
+    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+    public class Plugin : BaseUnityPlugin
     {
-      logger = Logger;
-      harmony.PatchAll();
+        internal static ManualLogSource logger;
+        internal static Harmony harmony = new(PluginInfo.PLUGIN_GUID);
 
-      // Plugin startup logic
-      Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
-    }
-  }
+        private void Awake()
+        {
+            logger = Logger;
+            harmony.PatchAll();
 
-  internal class LobbyCompatibilityCompatibility
-  {
-    public static void Init()
-    {
-      Plugin.logger.LogWarning("LobbyCompatibility detected, registering plugin with LobbyCompatibility.");
-
-      Version pluginVersion = Version.Parse(ApparatusFix.PluginInfo.PLUGIN_VERSION);
-
-      LobbyCompatibility.Features.PluginHelper.RegisterPlugin(
-        "LethalRichPresence",
-        pluginVersion,
-        LobbyCompatibility.Enums.CompatibilityLevel.ClientOptional,
-        LobbyCompatibility.Enums.VersionStrictness.None
-      );
-    }
-  }
-
-  [HarmonyPatch(typeof(GrabbableObject))]
-  public class Patch
-  {
-    private static bool ShouldReturn(GrabbableObject item)
-    {
-      if (!item.isInShipRoom)
-      {
-        Plugin.logger.LogDebug($"{item.__getTypeName()} is not in ship room");
-        return true;
-      }
-
-      if (item.__getTypeName() != "LungProp")
-      {
-        Plugin.logger.LogDebug($"{item.__getTypeName()} is not a predefined type");
-        return true;
-      }
-
-      return false;
+            // Plugin startup logic
+            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
+        }
     }
 
-    public static void Disable(GrabbableObject item)
+    internal class LobbyCompatibilityCompatibility
     {
-      if (ShouldReturn(item))
-        return;
+        public static void Init()
+        {
+            Plugin.logger.LogWarning("LobbyCompatibility detected, registering plugin with LobbyCompatibility.");
 
-      if ("LungProp" == item.__getTypeName())
-      {
-        Plugin.logger.LogDebug("Disabling sound of LungProp");
+            Version pluginVersion = Version.Parse(PluginInfo.PLUGIN_VERSION);
 
-        LungProp itemLung = (LungProp)item;
-        itemLung.isLungDocked = false;
-        itemLung.isLungDockedInElevator = false;
-        itemLung.isLungPowered = false;
-        itemLung.GetComponent<AudioSource>().Stop();
-      }
+            LobbyCompatibility.Features.PluginHelper.RegisterPlugin(PluginInfo.PLUGIN_GUID, pluginVersion, LobbyCompatibility.Enums.CompatibilityLevel.ClientOptional, LobbyCompatibility.Enums.VersionStrictness.None);
+        }
     }
 
-    [HarmonyPatch("DiscardItemClientRpc")]
-    [HarmonyPostfix]
-    public static void DiscardItemClientRpc(GrabbableObject __instance)
+    [HarmonyPatch(typeof(PlayerControllerB))]
+    public class Patch
     {
-      Plugin.logger.LogDebug($"DiscardItemClientRpc {__instance.itemProperties.itemName}");
 
-      if (__instance.isInShipRoom)
-      {
-        Disable(__instance);
-      }
+        public static void Disable(GrabbableObject item)
+        {
+            if ("LungProp" == item.__getTypeName())
+            {
+                LungProp itemLung = (LungProp)item;
+
+                if (itemLung.GetComponent<AudioSource>().isPlaying)
+                {
+                    Plugin.logger.LogDebug("Disabling sound of LungProp");
+
+                    itemLung.isLungDocked = false;
+                    itemLung.isLungDockedInElevator = false;
+                    itemLung.isLungPowered = false;
+                    itemLung.GetComponent<AudioSource>().Stop();
+                }
+            }
+        }
+
+        [HarmonyPatch("GrabObjectServerRpc")]
+        [HarmonyPostfix]
+        public static void EquipItemServerRpc(PlayerControllerB __instance, ref NetworkObjectReference grabbedObject)
+        {
+            if (grabbedObject.TryGet(out var networkObject) && (bool)networkObject.GetComponentInChildren<GrabbableObject>())
+            {
+                Plugin.logger.LogDebug($"EquipItemServerRpc {networkObject.GetComponentInChildren<GrabbableObject>().itemProperties.itemName}");
+
+                Disable(networkObject.GetComponentInChildren<GrabbableObject>());
+            }
+        }
+
+        [HarmonyPatch("GrabObjectClientRpc")]
+        [HarmonyPostfix]
+        public static void EquipItemClientRpc(PlayerControllerB __instance, ref NetworkObjectReference grabbedObject)
+        {
+            if (grabbedObject.TryGet(out var networkObject) && (bool)networkObject.GetComponentInChildren<GrabbableObject>())
+            {
+                Plugin.logger.LogDebug($"EquipItemClientRpc {networkObject.GetComponentInChildren<GrabbableObject>().itemProperties.itemName}");
+
+                Disable(networkObject.GetComponentInChildren<GrabbableObject>());
+            }
+        }
     }
-
-    [HarmonyPatch("DiscardItemOnClient")]
-    [HarmonyPostfix]
-    public static void DiscardItemOnClient(GrabbableObject __instance)
-    {
-      Plugin.logger.LogDebug($"DiscardItemOnClient {__instance.itemProperties.itemName}");
-
-      if (__instance.isInShipRoom)
-      {
-        Disable(__instance);
-      }
-    }
-  }
 }
