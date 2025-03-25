@@ -9,6 +9,7 @@ using UnityEngine;
 namespace ApparatusFix
 {
   [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
+	[BepInDependency("BMX.LobbyCompatibility", BepInDependency.DependencyFlags.SoftDependency)]
   public class Plugin : BaseUnityPlugin
   {
     internal static ManualLogSource logger;
