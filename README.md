@@ -1,6 +1,6 @@
 # ApparatusFix
 
-Disable the sound of apparatus after dropping it in the ship.
+A small mod for fixing Apparatus sound desyncs.
 
 ## Credits
 

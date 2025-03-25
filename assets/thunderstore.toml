@@ -7,7 +7,7 @@ repository = "https://thunderstore.io"
 [package]
 namespace = "mrov"
 name = "ApparatusFix"
-description = "A Lethal Company mod that fixes Apparatus sound desyncs."
+description = "A mod for fixing Apparatus sound desyncs."
 websiteUrl = "https://github.com/AndreyMrovol/LethalApparatusFix/"
 containsNsfwContent = false
 

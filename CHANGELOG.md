@@ -1,3 +1,7 @@
+# 0.0.3
+
+- updated readme
+
 # 0.0.2
 
 - merged [PR #1](https://github.com/AndreyMrovol/LethalApparatusFix/pull/1) (thank you, `dopadream`!)
