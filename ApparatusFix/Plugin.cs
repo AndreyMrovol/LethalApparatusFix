@@ -8,12 +8,11 @@ using UnityEngine;
 
 namespace ApparatusFix
 {
-    [BepInDependency(PluginInfos.LOBBY_COMPATIBILITY, BepInDependency.DependencyFlags.SoftDependency)]
-    [BepInPlugin(PluginInfos.PLUGIN_GUID, PluginInfos.PLUGIN_NAME, PluginInfos.PLUGIN_VERSION)]
+    [BepInPlugin(PluginInfo.PLUGIN_GUID, PluginInfo.PLUGIN_NAME, PluginInfo.PLUGIN_VERSION)]
     public class Plugin : BaseUnityPlugin
     {
         internal static ManualLogSource logger;
-        internal static Harmony harmony = new(PluginInfos.PLUGIN_GUID);
+        internal static Harmony harmony = new(PluginInfo.PLUGIN_GUID);
 
         private void Awake()
         {
@@ -21,7 +20,7 @@ namespace ApparatusFix
             harmony.PatchAll();
 
             // Plugin startup logic
-            Logger.LogInfo($"Plugin {PluginInfos.PLUGIN_GUID} is loaded!");
+            Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
         }
     }
 
@@ -31,9 +30,9 @@ namespace ApparatusFix
         {
             Plugin.logger.LogWarning("LobbyCompatibility detected, registering plugin with LobbyCompatibility.");
 
-            Version pluginVersion = Version.Parse(PluginInfos.PLUGIN_VERSION);
+            Version pluginVersion = Version.Parse(PluginInfo.PLUGIN_VERSION);
 
-            LobbyCompatibility.Features.PluginHelper.RegisterPlugin(PluginInfos.PLUGIN_GUID, pluginVersion, LobbyCompatibility.Enums.CompatibilityLevel.ClientOptional, LobbyCompatibility.Enums.VersionStrictness.None);
+            LobbyCompatibility.Features.PluginHelper.RegisterPlugin(PluginInfo.PLUGIN_GUID, pluginVersion, LobbyCompatibility.Enums.CompatibilityLevel.ClientOptional, LobbyCompatibility.Enums.VersionStrictness.None);
         }
     }
 

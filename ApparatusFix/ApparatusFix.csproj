@@ -1,10 +1,10 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <TargetFramework>net46</TargetFramework>
         <AssemblyName>ApparatusFix</AssemblyName>
-        <Description>Lethal Company plugin that fixes Apparatus sound desyncs</Description>
-        <Version>0.0.2</Version>
+        <Description>A template for Lethal Company</Description>
+        <Version>0.0.1</Version>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <LangVersion>latest</LangVersion>
     </PropertyGroup>
@@ -12,6 +12,7 @@
     <ItemGroup>
         <PackageReference Include="BepInEx.Analyzers" Version="1.*" PrivateAssets="all"/>
         <PackageReference Include="BepInEx.Core" Version="5.*" />
+        <PackageReference Include="BepInEx.PluginInfoProps" Version="1.*"/>
         <PackageReference Include="LethalAPI.GameLibs" Version="49.0.0" />
         <PackageReference Include="Lib.Harmony" Version="2.2.2" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
