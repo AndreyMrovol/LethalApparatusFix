@@ -20,6 +20,11 @@ namespace ApparatusFix
 			logger = Logger;
 			harmony.PatchAll();
 
+			if (BepInEx.Bootstrap.Chainloader.PluginInfos.ContainsKey("BMX.LobbyCompatibility"))
+			{
+				LobbyCompatibilityCompatibility.Init();
+			}
+
 			// Plugin startup logic
 			Logger.LogInfo($"Plugin {PluginInfo.PLUGIN_GUID} is loaded!");
 		}
